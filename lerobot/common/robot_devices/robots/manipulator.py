@@ -234,9 +234,19 @@ class ManipulatorRobot:
             )
 
         # Connect the arms
+        if self.config.input_stream_ip and self.config.output_stream_ip:
+            print("Error: Only input or output can be streamed, not both.")
+            raise ValueError
+        
+        if self.config.input_stream_ip:
+            self.follower_arms = []
+        elif self.config.output_stream_ip:
+            self.leader_arms = []
+        
         for name in self.follower_arms:
             print(f"Connecting {name} follower arm.")
             self.follower_arms[name].connect()
+
         for name in self.leader_arms:
             print(f"Connecting {name} leader arm.")
             self.leader_arms[name].connect()
