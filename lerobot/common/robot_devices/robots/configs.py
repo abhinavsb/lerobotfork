@@ -629,6 +629,8 @@ class So100AlohaRobotConfig(ManipulatorRobotConfig):
     # properly assembled, no manual calibration step is expected. If you need to run manual calibration,
     # simply update this path to ".cache/calibration/aloha"
     calibration_dir: str = ".cache/calibration/aloha_default"
+    input_stream_ip = None
+    output_stream_ip = None
 
     # /!\ FOR SAFETY, READ THIS /!\
     # `max_relative_target` limits the magnitude of the relative positional target vector for safety purposes.
