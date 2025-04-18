@@ -32,6 +32,7 @@ from lerobot.common.robot_devices.motors.utils import MotorsBus, make_motors_bus
 from lerobot.common.robot_devices.robots.configs import ManipulatorRobotConfig
 from lerobot.common.robot_devices.robots.utils import get_arm_id
 from lerobot.common.robot_devices.utils import RobotDeviceAlreadyConnectedError, RobotDeviceNotConnectedError
+from lerobot.common.utils.stream import PubServer, SubClient
 
 
 def ensure_safe_goal_position(
@@ -166,6 +167,7 @@ class ManipulatorRobot:
         self.cameras = make_cameras_from_configs(self.config.cameras)
         self.is_connected = False
         self.logs = {}
+        self.stream = None
 
     def get_motor_names(self, arm: dict[str, MotorsBus]) -> list:
         return [f"{arm}_{motor}" for arm, bus in arm.items() for motor in bus.motors]
@@ -462,11 +464,21 @@ class ManipulatorRobot:
 
         # Prepare to assign the position of the leader to the follower
         leader_pos = {}
+        joint_data = []
         for name in self.leader_arms:
             before_lread_t = time.perf_counter()
             leader_pos[name] = self.leader_arms[name].read("Present_Position")
+            joint_data.append(leader_pos[name])
             leader_pos[name] = torch.from_numpy(leader_pos[name])
             self.logs[f"read_leader_{name}_pos_dt_s"] = time.perf_counter() - before_lread_t
+            
+        if self.config.input_stream_ip:
+            self.stream.publish(joint_data)
+        elif self.config.output_stream_ip:
+            joint_data = self.stream.receive()
+            for i, name in enumerate(self.follower_arms):
+                leader_pos[name] = torch.from_numpy(joint_data[i])
+        
 
         # Send goal position to the follower
         follower_goal_pos = {}
