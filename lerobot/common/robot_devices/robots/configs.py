@@ -88,6 +88,8 @@ class AlohaRobotConfig(ManipulatorRobotConfig):
     # properly assembled, no manual calibration step is expected. If you need to run manual calibration,
     # simply update this path to ".cache/calibration/aloha"
     calibration_dir: str = ".cache/calibration/aloha_default"
+    input_stream_ip = None
+    output_stream_ip = None
 
     # /!\ FOR SAFETY, READ THIS /!\
     # `max_relative_target` limits the magnitude of the relative positional target vector for safety purposes.
@@ -212,6 +214,8 @@ class AlohaRobotConfig(ManipulatorRobotConfig):
 @dataclass
 class KochRobotConfig(ManipulatorRobotConfig):
     calibration_dir: str = ".cache/calibration/koch"
+    input_stream_ip = None
+    output_stream_ip = None
     # `max_relative_target` limits the magnitude of the relative positional target vector for safety purposes.
     # Set this to a positive scalar to have the same value for all motors, or a list that is the same length as
     # the number of motors in your follower arms.
@@ -280,6 +284,8 @@ class KochRobotConfig(ManipulatorRobotConfig):
 @dataclass
 class KochBimanualRobotConfig(ManipulatorRobotConfig):
     calibration_dir: str = ".cache/calibration/koch_bimanual"
+    input_stream_ip = None
+    output_stream_ip = None
     # `max_relative_target` limits the magnitude of the relative positional target vector for safety purposes.
     # Set this to a positive scalar to have the same value for all motors, or a list that is the same length as
     # the number of motors in your follower arms.
@@ -372,6 +378,8 @@ class KochBimanualRobotConfig(ManipulatorRobotConfig):
 @dataclass
 class MossRobotConfig(ManipulatorRobotConfig):
     calibration_dir: str = ".cache/calibration/moss"
+    input_stream_ip = None
+    output_stream_ip = None
     # `max_relative_target` limits the magnitude of the relative positional target vector for safety purposes.
     # Set this to a positive scalar to have the same value for all motors, or a list that is the same length as
     # the number of motors in your follower arms.
@@ -435,6 +443,8 @@ class MossRobotConfig(ManipulatorRobotConfig):
 @dataclass
 class So100RobotConfig(ManipulatorRobotConfig):
     calibration_dir: str = ".cache/calibration/so100"
+    input_stream_ip = None
+    output_stream_ip = None
     # `max_relative_target` limits the magnitude of the relative positional target vector for safety purposes.
     # Set this to a positive scalar to have the same value for all motors, or a list that is the same length as
     # the number of motors in your follower arms.
@@ -564,6 +574,8 @@ class LeKiwiRobotConfig(RobotConfig):
     )
 
     calibration_dir: str = ".cache/calibration/lekiwi"
+    input_stream_ip = None
+    output_stream_ip = None
 
     leader_arms: dict[str, MotorsBusConfig] = field(
         default_factory=lambda: {
@@ -629,6 +641,8 @@ class So100AlohaRobotConfig(ManipulatorRobotConfig):
     # properly assembled, no manual calibration step is expected. If you need to run manual calibration,
     # simply update this path to ".cache/calibration/aloha"
     calibration_dir: str = ".cache/calibration/aloha_default"
+    input_stream_ip = None
+    output_stream_ip = None
 
     # /!\ FOR SAFETY, READ THIS /!\
     # `max_relative_target` limits the magnitude of the relative positional target vector for safety purposes.

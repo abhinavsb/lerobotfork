@@ -170,6 +170,7 @@ from lerobot.common.robot_devices.robots.utils import Robot, make_robot_from_con
 from lerobot.common.robot_devices.utils import busy_wait, safe_disconnect
 from lerobot.common.utils.utils import has_method, init_logging, log_say
 from lerobot.configs import parser
+from lerobot.common.utils.stream import PubServer, SubClient
 
 ########################################################################################
 # Control modes
@@ -408,6 +409,17 @@ def control_robot(cfg: ControlPipelineConfig):
     logging.info(pformat(asdict(cfg)))
 
     robot = make_robot_from_config(cfg.robot)
+    
+    if robot.config.input_stream_ip is not None and robot.config.output_stream_ip is not None:
+        raise ValueError("You can only stream either input or output, not both.")
+    
+    if robot.config.input_stream_ip:
+        server = PubServer(host=robot.config.input_stream_ip)
+        server.start()
+        robot.stream = server
+    elif robot.config.output_stream_ip:
+        client = SubClient(robot.config.output_stream_ip)
+        robot.stream = client     
 
     # TODO(Steven): Blueprint for fixed window size
 
