@@ -501,6 +501,9 @@ class ManipulatorRobot:
             follower_pos[name] = torch.from_numpy(follower_pos[name])
             self.logs[f"read_follower_{name}_pos_dt_s"] = time.perf_counter() - before_fread_t
 
+        if self.config.input_stream_ip:
+            # TODO(rcadene): Implement input stream
+            raise NotImplementedError("Input stream is not implemented yet.")
         # Create state by concatenating follower current position
         state = []
         for name in self.follower_arms:

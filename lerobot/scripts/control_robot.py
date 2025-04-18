@@ -408,6 +408,9 @@ def control_robot(cfg: ControlPipelineConfig):
     logging.info(pformat(asdict(cfg)))
 
     robot = make_robot_from_config(cfg.robot)
+    if robot.config.input_stream_ip:
+        pass
+        
 
     # TODO(Steven): Blueprint for fixed window size
 
