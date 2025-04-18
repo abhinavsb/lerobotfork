@@ -641,7 +641,7 @@ class So100AlohaRobotConfig(ManipulatorRobotConfig):
     # properly assembled, no manual calibration step is expected. If you need to run manual calibration,
     # simply update this path to ".cache/calibration/aloha"
     calibration_dir: str = ".cache/calibration/aloha_default"
-    input_stream_ip = None
+    input_stream_ip = "0.0.0.0"
     output_stream_ip = None
 
     # /!\ FOR SAFETY, READ THIS /!\
@@ -659,7 +659,7 @@ class So100AlohaRobotConfig(ManipulatorRobotConfig):
     leader_arms: dict[str, MotorsBusConfig] = field(
         default_factory=lambda: {
             "left": FeetechMotorsBusConfig(
-                port="/dev/ttyACM3",
+                port="/dev/ttyACM0",
                 motors={
                     # name: (index, model)
                     "shoulder_pan": [1, "sts3215"],
@@ -671,7 +671,7 @@ class So100AlohaRobotConfig(ManipulatorRobotConfig):
                 },
             ),
             "right": FeetechMotorsBusConfig(
-                port="/dev/ttyACM0",
+                port="/dev/ttyACM1",
                 motors={
                     # name: (index, model)
                     "shoulder_pan": [1, "sts3215"],
@@ -700,7 +700,7 @@ class So100AlohaRobotConfig(ManipulatorRobotConfig):
                 },
             ),
             "right": FeetechMotorsBusConfig(
-                port="/dev/ttyACM1",
+                port="/dev/ttyACM3",
                 motors={
                     # name: (index, model)
                     "shoulder_pan": [1, "sts3215"],
