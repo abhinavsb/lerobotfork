@@ -139,6 +139,7 @@ import os
 import time
 from dataclasses import asdict
 from pprint import pformat
+import zmq
 
 import rerun as rr
 
@@ -419,7 +420,8 @@ def control_robot(cfg: ControlPipelineConfig):
         robot.stream = server
     elif robot.config.output_stream_ip:
         client = SubClient(robot.config.output_stream_ip)
-        robot.stream = client     
+        robot.stream = client
+        robot.stream.socket.setsockopt(zmq.SUBSCRIBE, b'')     
 
     # TODO(Steven): Blueprint for fixed window size
 

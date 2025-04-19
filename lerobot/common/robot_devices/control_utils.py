@@ -23,6 +23,7 @@ import traceback
 from contextlib import nullcontext
 from copy import copy
 from functools import cache
+import zmq
 
 import rerun as rr
 import torch
@@ -243,6 +244,8 @@ def control_loop(
 
     timestamp = 0
     start_episode_t = time.perf_counter()
+    if robot.config.output_stream_ip:
+        robot.stream.socket.setsockopt(zmq.SUBSCRIBE, b'')
     while timestamp < control_time_s:
         start_loop_t = time.perf_counter()
 
@@ -286,6 +289,9 @@ def control_loop(
         if events["exit_early"]:
             events["exit_early"] = False
             break
+    if robot.config.output_stream_ip:
+        robot.stream.socket.setsockopt(zmq.UNSUBSCRIBE, b'')
+    
 
 
 def reset_environment(robot, events, reset_time_s, fps):
