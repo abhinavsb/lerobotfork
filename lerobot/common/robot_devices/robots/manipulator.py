@@ -241,9 +241,9 @@ class ManipulatorRobot:
             raise ValueError
         
         if self.config.input_stream_ip:
-            self.follower_arms = []
+            self.follower_arms = {}
         elif self.config.output_stream_ip:
-            self.leader_arms = []
+            self.leader_arms = {}
         
         for name in self.follower_arms:
             print(f"Connecting {name} follower arm.")
