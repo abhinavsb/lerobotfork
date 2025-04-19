@@ -236,13 +236,13 @@ class ManipulatorRobot:
             )
 
         # Connect the arms
-        if self.config.input_stream_ip and self.config.output_stream_ip:
+        if self.config.server_out_ip and self.config.server_ip_from_client:
             print("Error: Only input or output can be streamed, not both.")
             raise ValueError
         
-        if self.config.input_stream_ip:
+        if self.config.server_out_ip:
             self.follower_arms = {}
-        elif self.config.output_stream_ip:
+        elif self.config.server_ip_from_client:
             self.leader_arms = {}
         
         for name in self.follower_arms:
@@ -472,9 +472,9 @@ class ManipulatorRobot:
             leader_pos[name] = torch.from_numpy(leader_pos[name])
             self.logs[f"read_leader_{name}_pos_dt_s"] = time.perf_counter() - before_lread_t
             
-        if self.config.input_stream_ip:
-            self.stream.publish(joint_data)
-        elif self.config.output_stream_ip:
+        if self.config.server_out_ip:
+            self.stream.publish(np.array(joint_data))
+        elif self.config.server_ip_from_client:
             joint_data = self.stream.receive()
             for i, name in enumerate(self.follower_arms):
                 leader_pos[name] = torch.from_numpy(joint_data[i])
@@ -513,22 +513,19 @@ class ManipulatorRobot:
             follower_pos[name] = torch.from_numpy(follower_pos[name])
             self.logs[f"read_follower_{name}_pos_dt_s"] = time.perf_counter() - before_fread_t
 
-        if self.config.input_stream_ip:
-            # TODO(rcadene): Implement input stream
-            raise NotImplementedError("Input stream is not implemented yet.")
         # Create state by concatenating follower current position
-        state = []
-        for name in self.follower_arms:
-            if name in follower_pos:
-                state.append(follower_pos[name])
-        state = torch.cat(state)
+        state, action = [], []
+        if self.config.server_out_ip is None:
+            for name in self.follower_arms:
+                if name in follower_pos:
+                    state.append(follower_pos[name])
+            state = torch.cat(state)
 
         # Create action by concatenating follower goal position
-        action = []
-        for name in self.follower_arms:
-            if name in follower_goal_pos:
-                action.append(follower_goal_pos[name])
-        action = torch.cat(action)
+            for name in self.follower_arms:
+                if name in follower_goal_pos:
+                    action.append(follower_goal_pos[name])
+            action = torch.cat(action)
 
         # Capture images from cameras
         images = {}
