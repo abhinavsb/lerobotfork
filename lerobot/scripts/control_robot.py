@@ -411,15 +411,15 @@ def control_robot(cfg: ControlPipelineConfig):
 
     robot = make_robot_from_config(cfg.robot)
     
-    if robot.config.input_stream_ip is not None and robot.config.output_stream_ip is not None:
+    if robot.config.server_out_ip is not None and robot.config.server_ip_from_client is not None:
         raise ValueError("You can only stream either input or output, not both.")
     
-    if robot.config.input_stream_ip:
-        server = PubServer(host=robot.config.input_stream_ip)
+    if robot.config.server_out_ip:
+        server = PubServer(host=robot.config.server_out_ip)
         server.start()
         robot.stream = server
-    elif robot.config.output_stream_ip:
-        client = SubClient(robot.config.output_stream_ip)
+    elif robot.config.server_ip_from_client:
+        client = SubClient(robot.config.server_ip_from_client)
         robot.stream = client
         robot.stream.socket.setsockopt(zmq.SUBSCRIBE, b'')     
 
