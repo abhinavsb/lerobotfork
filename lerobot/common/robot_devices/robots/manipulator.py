@@ -26,6 +26,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+import cv2
 
 from lerobot.common.robot_devices.cameras.utils import make_cameras_from_configs
 from lerobot.common.robot_devices.motors.utils import MotorsBus, make_motors_buses_from_configs
@@ -533,6 +534,11 @@ class ManipulatorRobot:
         for name in self.cameras:
             before_camread_t = time.perf_counter()
             images[name] = self.cameras[name].async_read()
+            # In your camera reading loop
+            img = self.cameras[name].async_read()  # Assuming this returns numpy array
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  #
+            img = cv2.resize(img, (320, 240))  # Before publishing Convert for proper Rerun display
+            self.image_stream.publish(name,img)
             images[name] = torch.from_numpy(images[name])
             self.logs[f"read_camera_{name}_dt_s"] = self.cameras[name].logs["delta_timestamp_s"]
             self.logs[f"async_read_camera_{name}_dt_s"] = time.perf_counter() - before_camread_t

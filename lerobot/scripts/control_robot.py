@@ -171,7 +171,7 @@ from lerobot.common.robot_devices.robots.utils import Robot, make_robot_from_con
 from lerobot.common.robot_devices.utils import busy_wait, safe_disconnect
 from lerobot.common.utils.utils import has_method, init_logging, log_say
 from lerobot.configs import parser
-from lerobot.common.utils.stream import PubServer, SubClient
+from lerobot.common.utils.stream import PubServer, SubClient, ImagePubServer
 
 ########################################################################################
 # Control modes
@@ -422,6 +422,10 @@ def control_robot(cfg: ControlPipelineConfig):
         client = SubClient(robot.config.server_ip_from_client)
         robot.stream = client
         robot.stream.socket.setsockopt(zmq.SUBSCRIBE, b'')     
+
+    if robot.config.viz_server_bind:
+        image_server = ImagePubServer(host=robot.config.viz_server_bind)
+        robot.image_stream = image_server
 
     # TODO(Steven): Blueprint for fixed window size
 

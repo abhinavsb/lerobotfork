@@ -68,42 +68,37 @@ class SubClient:
         header = np.frombuffer(data[:8], dtype=np.uint32)
         return np.frombuffer(data[8:], dtype=np.float32).reshape(header)
 
-# ===========================
-# Example Usage
-# ===========================
-if __name__ == "__main__":
-    import sys
 
-    # Usage: python thisfile.py server|client [server_ip]
-    if len(sys.argv) < 2:
-        print("Usage: python thisfile.py server|client [server_ip]")
-        sys.exit(1)
+class ImagePubServer:
+    def __init__(self, host="*", port=5557):
+        self.ctx = zmq.Context(io_threads=2)
+        self.socket = self.ctx.socket(zmq.PUB)
+        self.socket.setsockopt(zmq.IMMEDIATE, 1)
+        self.socket.setsockopt(zmq.SNDHWM, 10)
+        self.socket.setsockopt(zmq.LINGER, 0)
+        self.socket.setsockopt(zmq.TCP_KEEPALIVE, 1)
+        self.socket.setsockopt(zmq.TCP_KEEPALIVE_IDLE, 30)
+        self.socket.setsockopt(zmq.TCP_KEEPALIVE_INTVL, 5)
+        self.socket.bind(f"tcp://{host}:{port}")
+        self.queue = Queue()
+        self.thread = Thread(target=self._publisher_loop, daemon=True)
+        self.sent_counter = 0
+        self.start_time = time.time()
+  
+    def _serialize_array(self, arr):
+            """Optimized for uint8 images"""
+            header = np.array(arr.shape, dtype=np.uint32).tobytes()
+            data = arr.astype(np.uint8).tobytes(order='C')
+            return header + data
 
-    if sys.argv[1] == "server":
-        server = PubServer()
-        server.start()
-        print("[Server] Started. Publishing random arrays.")
-        try:
+    def publish(self, camera_name, array):
+            self.queue.put((camera_name, array))
+
+    def _publisher_loop(self):
             while True:
-                arr = np.random.rand(100, 100).astype(np.float32)
-                server.publish(arr)
-                time.sleep(0.01)  # 100 Hz publish rate
-        except KeyboardInterrupt:
-            print("\n[Server] Stopped.")
-
-    elif sys.argv[1] == "client":
-        if len(sys.argv) < 3:
-            print("Usage: python thisfile.py client <server_ip>")
-            sys.exit(1)
-        client = SubClient(sys.argv[2])
-        print("[Client] Started. Receiving arrays.")
-        try:
-            while True:
-                arr = client.receive()
-                if arr is not None:
-                    # Process array here if needed
-                    pass
-        except KeyboardInterrupt:
-            print("\n[Client] Stopped.")
-    else:
-        print("Unknown mode. Use 'server' or 'client'.")
+                if not self.queue.empty():
+                    camera_name, arr = self.queue.get()
+                    self.socket.send_multipart([
+                        camera_name.encode(),
+                        self._serialize_array(arr)
+                    ])

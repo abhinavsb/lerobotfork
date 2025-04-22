@@ -89,7 +89,7 @@ class AlohaRobotConfig(ManipulatorRobotConfig):
     # simply update this path to ".cache/calibration/aloha"
     calibration_dir: str = ".cache/calibration/aloha_default"
     server_out_ip = None
-    server_ip_from_client = "192.168.195.150"
+    server_ip_from_client = "192.168.226.150"
 
     # /!\ FOR SAFETY, READ THIS /!\
     # `max_relative_target` limits the magnitude of the relative positional target vector for safety purposes.
@@ -642,7 +642,8 @@ class So100AlohaRobotConfig(ManipulatorRobotConfig):
     # simply update this path to ".cache/calibration/aloha"
     calibration_dir: str = ".cache/calibration/aloha_default"
     server_out_ip = None
-    server_ip_from_client = "192.168.195.150"
+    server_ip_from_client = "192.168.226.150"
+    viz_server_bind = "0.0.0.0"
 
     # /!\ FOR SAFETY, READ THIS /!\
     # `max_relative_target` limits the magnitude of the relative positional target vector for safety purposes.
@@ -688,7 +689,7 @@ class So100AlohaRobotConfig(ManipulatorRobotConfig):
     follower_arms: dict[str, MotorsBusConfig] = field(
         default_factory=lambda: {
             "left": FeetechMotorsBusConfig(
-                port="/dev/ttyACM0",
+                port="/dev/ttyACM1",
                 motors={
                     # name: (index, model)
                     "shoulder_pan": [1, "sts3215"],
@@ -700,7 +701,7 @@ class So100AlohaRobotConfig(ManipulatorRobotConfig):
                 },
             ),
             "right": FeetechMotorsBusConfig(
-                port="/dev/ttyACM1",
+                port="/dev/ttyACM0",
                 motors={
                     # name: (index, model)
                     "shoulder_pan": [1, "sts3215"],
@@ -717,19 +718,19 @@ class So100AlohaRobotConfig(ManipulatorRobotConfig):
     cameras: dict[str, CameraConfig] = field(
         default_factory=lambda: {
             "overhead": OpenCVCameraConfig(
-                camera_index=0,
+                camera_index=2,
                 fps=30,
                 width=640,
                 height=360,
             ),
             "left_gripper": OpenCVCameraConfig(
-                camera_index=7,
+                camera_index=4,
                 fps=30,
                 width=320,
                 height=240,
             ),
             "right_gripper": OpenCVCameraConfig(
-                camera_index=3,
+                camera_index=6,
                 fps=30,
                 width=320,
                 height=240,
