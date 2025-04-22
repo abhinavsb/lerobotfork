@@ -24,24 +24,16 @@ class PubServer:
         self.start_time = time.time()
 
     def _serialize_array(self, arr):
-        arr = np.ascontiguousarray(arr, dtype=np.float32)
-        header = np.array(arr.shape, dtype=np.uint32)
-        return memoryview(header.tobytes()) + memoryview(arr.tobytes())
+        """Convert numpy array to C-style bytes with header"""
+        header = np.array(arr.shape, dtype=np.uint32).tobytes()
+        data = arr.astype(np.float32).tobytes(order='C')
+        return header + data
 
     def _publisher_loop(self):
         while True:
-            try:
-                arr = self.queue.get(block=True, timeout=0.001)
-                self.socket.send(self._serialize_array(arr), copy=False)
-                self.sent_counter += 1
-                # Print publish rate every 5 seconds
-                if self.sent_counter % 1000 == 0:
-                    elapsed = time.time() - self.start_time
-                    print(f"[Pub] Rate: {self.sent_counter/elapsed:.1f} msg/sec")
-                    self.sent_counter = 0
-                    self.start_time = time.time()
-            except Empty:
-                pass
+            if not self.queue.empty():
+                arr = self.queue.get()
+                self.socket.send(self._serialize_array(arr))
 
     def publish(self, array):
         self.queue.put(array)

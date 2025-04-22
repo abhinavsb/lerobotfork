@@ -473,6 +473,7 @@ class ManipulatorRobot:
             self.logs[f"read_leader_{name}_pos_dt_s"] = time.perf_counter() - before_lread_t
             
         if self.config.server_out_ip:
+            print("sending data")
             self.stream.publish(np.array(joint_data))
         elif self.config.server_ip_from_client:
             joint_data = self.stream.receive()
