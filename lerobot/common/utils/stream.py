@@ -67,17 +67,10 @@ class SubClient:
 
     def receive(self, timeout_ms=1):
         """Non-blocking receive with polling and latency measurement."""
-        start = time.perf_counter()
-        if self.socket.poll(timeout_ms, zmq.POLLIN):
-            data = self.socket.recv(copy=False)
-            arr = self._deserialize(data)
-            latency = (time.perf_counter() - start) * 1000
-            self.latency_samples.append(latency)
-            if len(self.latency_samples) >= 1000:
-                print(f"[Sub] Avg latency: {np.mean(self.latency_samples):.2f} ms")
-                self.latency_samples.clear()
-            return arr
-        return None
+        data = self.socket.recv()  # This call blocks until data arrives[3][5][7][8]
+        header = np.frombuffer(data[:8], dtype=np.uint32)
+        arr = np.frombuffer(data[8:], dtype=np.float32).reshape(header)
+        return arr
 
     def _deserialize(self, data):
         header = np.frombuffer(data[:8], dtype=np.uint32)

@@ -275,7 +275,7 @@ def control_loop(
 
             image_keys = [key for key in observation if "image" in key]
             # for key in image_keys:
-            #     cv2.imshow(key, cv2.cvtColor(observation[key].numpy(), cv2.COLOR_RGB2BGR))
+            #     how(key, cv2.cvtColor(observation[key].numpy(), cv2.COLOR_RGB2BGR))
             cv2.waitKey(1)
 
         if fps is not None:
